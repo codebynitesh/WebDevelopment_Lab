@@ -57,8 +57,3 @@ Pressing equals again does not repeat the previous operation.
 Results use 12 significant digits to reduce decimal rounding errors.
 Percentage directly divides a number by 100; it is not a financial percentage rule.
 
-## Submitting
-Test the project and make sure you understand the code.
-Follow your instructor's rules about AI assistance and acknowledgement.
-Submit the HTML, CSS, and JavaScript together in a ZIP folder.
-Include this README only if documentation is wanted.
