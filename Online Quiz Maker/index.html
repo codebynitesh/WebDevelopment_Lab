@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Quiz Maker | Simple Quiz Maker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <button class="logo" data-page="home">Online Quiz Maker<span>.</span></button>
+      <nav aria-label="Main navigation">
+        <button data-page="home" class="nav-button active">Home</button>
+        <button data-page="quizzes" class="nav-button">Quizzes</button>
+        <button data-page="create" class="nav-button">Create a quiz</button>
+      </nav>
+      <div class="account-controls">
+        <button id="account-button" class="small-button">Log in / Register</button>
+        <button id="logout-button" class="text-button" hidden>Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <p id="connection-banner" class="demo-banner"><strong>Firebase setup needed.</strong> You can try the sample quizzes now. Real accounts, shared quizzes, and saved scores require your Firebase project.</p>
+    <details id="setup-panel" class="setup-panel">
+      <summary>How do I connect Firebase?</summary>
+      <ol>
+        <li>Create a Firebase project and register a web app.</li>
+        <li>Enable Email/Password sign-in and create a Firestore database.</li>
+        <li>Publish the rules from <strong>firestore.rules</strong>.</li>
+        <li>Paste your web configuration into <strong>firebase-config.js</strong>.</li>
+        <li>For real login, open this folder with VS Code Live Server and reload. Sample quizzes can also be opened directly.</li>
+      </ol>
+      <p>The README includes each step. No Python or payment details are needed to edit the code.</p>
+    </details>
+    <p id="notice" role="status" hidden></p>
+
+    <!-- Home page -->
+    <section id="home-page" class="page">
+      <div class="welcome">
+        <p class="label">A SIMPLE PLACE TO PRACTISE</p>
+        <h1>Learn something.<br><span>Put it to the test.</span></h1>
+        <p id="welcome-name">Welcome! Make a quiz or try one from the collection.</p>
+      </div>
+      <div class="two-columns home-cards">
+        <article class="card">
+          <span class="card-icon" aria-hidden="true">?</span>
+          <h2>Take a quiz</h2>
+          <p>Pick a topic, answer one question at a time, and see how you did.</p>
+          <button class="button" data-page="quizzes">Browse quizzes →</button>
+        </article>
+        <article class="card">
+          <span class="card-icon purple" aria-hidden="true">+</span>
+          <h2>Create your own</h2>
+          <p>Add your questions, write four choices, and choose the correct answers.</p>
+          <button class="button secondary" data-page="create">Create a quiz →</button>
+        </article>
+      </div>
+      <section class="card results-home" aria-labelledby="recent-title">
+        <h2 id="recent-title">Your recent scores</h2>
+        <p id="recent-empty">Log in before taking a quiz to save your scores.</p>
+        <ul id="recent-list" class="plain-list"></ul>
+      </section>
+      <p class="page-note">Just practising? You can take any quiz as a guest.</p>
+    </section>
+
+    <!-- Quiz listing -->
+    <section id="quizzes-page" class="page" hidden>
+      <div class="section-heading">
+        <div><p class="label">PICK SOMETHING TO TRY</p><h1>Available quizzes</h1></div>
+        <button class="button" data-page="create">+ Create a quiz</button>
+      </div>
+      <p class="intro-text">Try a sample or one you have created. New quizzes appear here after publishing.</p>
+      <div id="quiz-list" class="two-columns"></div>
+    </section>
+
+    <!-- Registration and login -->
+    <section id="account-page" class="page" hidden>
+      <p class="label">MAKE IT YOUR OWN</p>
+      <h1>Your Online Quiz Maker account</h1>
+      <p class="intro-text">Use your email and password to sign in with Firebase. Your display name is public, but your email is not shown on quiz cards.</p>
+      <div class="two-columns">
+        <form id="register-form" class="card">
+          <h2>Create an account</h2>
+          <label for="register-name">Display name</label>
+          <input id="register-name" type="text" placeholder="For example, Alex" minlength="2" maxlength="30" autocomplete="nickname" required>
+          <label for="register-email">Email address</label>
+          <input id="register-email" type="email" placeholder="you@example.com" maxlength="254" autocomplete="email" required>
+          <label for="register-password">Password</label>
+          <input id="register-password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
+          <label for="confirm-password">Confirm password</label>
+          <input id="confirm-password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required>
+          <p class="page-note">Use at least 8 characters and follow your Firebase password policy. Passwords are handled by Firebase, not saved in quiz documents.</p>
+          <button id="register-submit" class="button" type="submit" disabled>Create account</button>
+        </form>
+        <form id="login-form" class="card">
+          <h2>Welcome back</h2>
+          <label for="login-email">Email address</label>
+          <input id="login-email" type="email" maxlength="254" autocomplete="email" required>
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" maxlength="128" autocomplete="current-password" required>
+          <button id="login-submit" class="button secondary" type="submit" disabled>Log in</button>
+          <button id="reset-password" class="text-button" type="button" disabled>Forgot password?</button>
+          <p class="page-note">For a reset email, enter your email above and click Forgot password. Log out on shared computers.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Quiz creation -->
+    <section id="create-page" class="page" hidden>
+      <p class="label">SHARE WHAT YOU KNOW</p>
+      <h1>Create a quiz</h1>
+      <p class="intro-text">Write a title. Add your questions. Then publish your quiz for others using this Firebase project.</p>
+      <div class="card quiz-details">
+        <label for="quiz-title">Quiz title</label>
+        <input id="quiz-title" type="text" placeholder="For example, Science Basics" maxlength="60" required>
+        <label for="quiz-description">Short description (optional)</label>
+        <textarea id="quiz-description" rows="2" maxlength="160" placeholder="What is your quiz about?"></textarea>
+      </div>
+      <div class="two-columns creator-columns">
+        <form id="question-form" class="card">
+          <h2>Add a question</h2>
+          <label for="question-text">Question</label>
+          <textarea id="question-text" rows="2" maxlength="250" required placeholder="Write your question here"></textarea>
+          <label for="option-a">Option A</label><input id="option-a" type="text" maxlength="120" required>
+          <label for="option-b">Option B</label><input id="option-b" type="text" maxlength="120" required>
+          <label for="option-c">Option C</label><input id="option-c" type="text" maxlength="120" required>
+          <label for="option-d">Option D</label><input id="option-d" type="text" maxlength="120" required>
+          <label for="correct-answer">Correct answer</label>
+          <select id="correct-answer" required>
+            <option value="">Choose an option</option><option value="0">Option A</option><option value="1">Option B</option><option value="2">Option C</option><option value="3">Option D</option>
+          </select>
+          <button class="button" type="submit">+ Add question</button>
+        </form>
+        <div class="card draft-card">
+          <h2>Questions added <span id="draft-count" class="count">0</span></h2>
+          <p id="draft-empty">Your questions will appear here after you click “Add question”.</p>
+          <ol id="draft-list"></ol>
+          <div class="draft-actions">
+            <button id="publish-button" class="button">Publish quiz</button>
+            <button id="clear-draft" class="text-button">Clear draft</button>
+          </div>
+          <p class="page-note">Add at least one question. Drafts are not saved until you publish. Maximum: 20 questions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Taking a quiz -->
+    <section id="take-page" class="page narrow-page" hidden>
+      <p class="label">TAKE YOUR TIME. YOU’VE GOT THIS.</p>
+      <h1 id="take-title">Quiz</h1>
+      <p class="page-note">Leaving this page ends this attempt.</p>
+      <div class="card">
+        <p id="progress-text" class="progress-text"></p>
+        <progress id="quiz-progress" value="0" max="1" aria-label="Quiz progress"></progress>
+        <form id="answer-form">
+          <fieldset>
+            <legend id="question-title"></legend>
+            <div id="answer-options"></div>
+          </fieldset>
+          <p id="answer-feedback" role="status" hidden></p>
+          <button id="check-button" class="button" type="submit">Check answer</button>
+          <button id="next-button" class="button" type="button" hidden>Next question →</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Quiz results -->
+    <section id="results-page" class="page narrow-page" hidden>
+      <div class="card score-card">
+        <p class="label">QUIZ COMPLETED</p>
+        <h1 id="result-title">Your results</h1>
+        <p id="score-number" class="score-number"></p>
+        <p id="score-description"></p>
+        <p id="save-note" class="page-note"></p>
+        <div class="result-actions">
+          <button id="retry-button" class="button">Try again</button>
+          <button data-page="quizzes" class="button secondary">Browse quizzes</button>
+        </div>
+      </div>
+      <h2 class="review-heading">Review your answers</h2>
+      <div id="answer-review"></div>
+    </section>
+  </main>
+
+  <footer>Online Quiz Maker · HTML, CSS, JavaScript & Firebase</footer>
+  <script src="firebase-config.js"></script>
+  <script src="firebase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

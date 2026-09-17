@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#191c28">
+  <title>Simple Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="calculator" aria-label="Calculator">
+    <!-- Keyboard help -->
+    <div class="toolbar">
+      <button id="help-button" class="icon-button" aria-label="Show keyboard help" aria-expanded="false" aria-controls="help-panel">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+    <section id="help-panel" class="panel" hidden>
+      <h2>Keyboard help</h2>
+      <p>Type numbers and +, -, *, or /.</p>
+      <p>Enter or = : calculate<br>Backspace : delete<br>Escape : clear</p>
+      <p>This calculator works one step at a time.<br>% divides the displayed number by 100.</p>
+    </section>
+
+    <!-- Calculator display -->
+    <div class="screen">
+      <div id="previous" class="previous"></div>
+      <output id="display" aria-live="polite" aria-atomic="true">0</output>
+      <p id="message" role="status"></p>
+    </div>
+
+    <!-- Calculator buttons -->
+    <div class="buttons">
+      <button class="key clear" data-value="AC">AC</button>
+      <button class="key operator" data-value="sign" aria-label="Change sign">+/−</button>
+      <button class="key operator" data-value="%" aria-label="Percent">%</button>
+      <button class="key operator" data-value="/" aria-label="Divide">÷</button>
+
+      <button class="key" data-value="7">7</button>
+      <button class="key" data-value="8">8</button>
+      <button class="key" data-value="9">9</button>
+      <button class="key operator" data-value="*" aria-label="Multiply">×</button>
+
+      <button class="key" data-value="4">4</button>
+      <button class="key" data-value="5">5</button>
+      <button class="key" data-value="6">6</button>
+      <button class="key operator" data-value="-" aria-label="Subtract">−</button>
+
+      <button class="key" data-value="1">1</button>
+      <button class="key" data-value="2">2</button>
+      <button class="key" data-value="3">3</button>
+      <button class="key operator" data-value="+" aria-label="Add">+</button>
+
+      <button class="key" data-value="0">0</button>
+      <button class="key" data-value="." aria-label="Decimal point">.</button>
+      <button class="key" data-value="DEL" aria-label="Delete last character">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h11v14H9l-7-7 7-7Z"/><path d="m11 9 6 6m0-6-6 6"/></svg>
+      </button>
+      <button class="key equals" data-value="=" aria-label="Equals">=</button>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

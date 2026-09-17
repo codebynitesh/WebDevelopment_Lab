@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owns(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function shortText(value, minimum, maximum) {
+      return value is string && value.size() >= minimum && value.size() <= maximum;
+    }
+
+    // The quiz after all writes in the publish batch have been applied.
+    function newQuiz(quizId) {
+      return getAfter(/databases/$(database)/documents/quizzes/$(quizId)).data;
+    }
+
+    function quizOwner(quizId) {
+      return get(/databases/$(database)/documents/quizzes/$(quizId)).data.ownerId;
+    }
+
+    // Public quiz information; only a signed-in user can publish.
+    match /quizzes/{quizId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['title', 'description', 'questionCount', 'author', 'ownerId', 'createdAt'])
+        && request.resource.data.ownerId == request.auth.uid
+        && shortText(request.resource.data.title, 1, 60)
+        && shortText(request.resource.data.description, 0, 160)
+        && shortText(request.resource.data.author, 2, 30)
+        && request.resource.data.questionCount is int
+        && request.resource.data.questionCount >= 1 && request.resource.data.questionCount <= 20
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if owns(resource.data.ownerId);
+
+      // Each question is saved with the new quiz in the same batch.
+      match /questions/{questionId} {
+        allow read: if exists(/databases/$(database)/documents/quizzes/$(quizId));
+        allow create: if owns(newQuiz(quizId).ownerId)
+          && newQuiz(quizId).createdAt == request.time
+          && request.resource.data.keys().hasOnly(['text', 'options', 'correct', 'position'])
+          && shortText(request.resource.data.text, 1, 250)
+          && request.resource.data.options is list && request.resource.data.options.size() == 4
+          && shortText(request.resource.data.options[0], 1, 120)
+          && shortText(request.resource.data.options[1], 1, 120)
+          && shortText(request.resource.data.options[2], 1, 120)
+          && shortText(request.resource.data.options[3], 1, 120)
+          && request.resource.data.options.toSet().size() == 4
+          && request.resource.data.correct is int
+          && request.resource.data.correct >= 0 && request.resource.data.correct <= 3
+          && request.resource.data.position is int
+          && request.resource.data.position >= 0
+          && request.resource.data.position < newQuiz(quizId).questionCount
+          && questionId == string(request.resource.data.position);
+        allow update: if false;
+        allow delete: if owns(quizOwner(quizId));
+      }
+    }
+
+    // Saved scores can only be accessed by the owner of this user ID.
+    match /users/{userId}/results/{resultId} {
+      allow read: if owns(userId);
+      allow create: if owns(userId)
+        && request.resource.data.keys().hasOnly(['quizId', 'title', 'score', 'total', 'createdAt'])
+        && shortText(request.resource.data.quizId, 1, 100)
+        && shortText(request.resource.data.title, 1, 60)
+        && request.resource.data.total is int
+        && request.resource.data.total >= 1 && request.resource.data.total <= 20
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0 && request.resource.data.score <= request.resource.data.total
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if owns(userId);
+    }
+
+    // No other collections are open to website users.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
